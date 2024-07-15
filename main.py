@@ -5,7 +5,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 from flask import Flask, jsonify, request
 
@@ -25,8 +24,10 @@ def download_file():
         file_path = 'Credentials.xlsx'
         credentials = pd.read_excel(file_path, skiprows=3, usecols=[1, 2], names=['User ID', 'Password'])
 
+        chrome_driver_path = r"C:\Users\Lalith\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
+
         # Specify download directory path
-        download_dir = '/tmp'  # Update to a directory that is writable in Render environment
+        download_dir = r'C:\Users\Lalith\Downloads'
 
         # Configure Chrome options for file download
         chrome_options = Options()
@@ -36,12 +37,9 @@ def download_file():
             'download.directory_upgrade': True,
             'safebrowsing.enabled': True
         })
-        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
 
         # Initialize Chrome WebDriver with options and path
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        driver = webdriver.Chrome(service=Service(chrome_driver_path), options=chrome_options)
 
         # Iterate over the credentials
         for index, row in credentials.iterrows():
@@ -104,4 +102,4 @@ def download_file():
         return jsonify({'status': 'error', 'message': str(e)})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(debug=True)
