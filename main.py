@@ -13,6 +13,13 @@ app = Flask(__name__)
 @app.route('/download', methods=['POST'])
 def download_file():
     try:
+        # Read the URL from the request body
+        data = request.get_json()
+        if 'url' not in data:
+            return jsonify({'status': 'error', 'message': 'URL is required'}), 400
+        
+        url = data['url']
+
         # Read credentials from Excel file
         file_path = 'Credentials.xlsx'
         credentials = pd.read_excel(file_path, skiprows=3, usecols=[1, 2], names=['User ID', 'Password'])
@@ -40,8 +47,8 @@ def download_file():
             password = row['Password']
 
             try:
-                # Navigate to the desired URL
-                driver.get("https://login.wowway.com/Default.aspx")
+                # Navigate to the URL provided in the request body
+                driver.get(url)
 
                 # Wait for the username input element to be present
                 wait = WebDriverWait(driver, 10)
